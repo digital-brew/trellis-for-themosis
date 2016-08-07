@@ -4,7 +4,6 @@
     creates: "{{ letsencrypt_keys_dir }}/{{ item.key }}.key"
   when: site_uses_letsencrypt
   with_dict: "{{ wordpress_sites }}"
-  tags: [letsencrypt_keys]
 
 - name: Ensure correct permissions on private keys
   file:
@@ -12,16 +11,14 @@
     mode: 0600
   when: site_uses_letsencrypt
   with_dict: "{{ wordpress_sites }}"
-  tags: [letsencrypt_keys]
 
 - name: Generate CSRs
-  shell: "openssl req -new -sha256 -key '{{ letsencrypt_keys_dir }}/{{ item.key }}.key' -subj '/' -reqexts SAN -config <(cat /etc/ssl/openssl.cnf <(printf '[SAN]\nsubjectAltName=DNS:{{ site_hosts | join(',DNS:') }}')) > {{ acme_tiny_data_directory }}/csrs/{{ item.key }}.csr"
+  shell: "openssl req -new -sha256 -key '{{ letsencrypt_keys_dir }}/{{ item.key }}.key' -subj '/' -reqexts SAN -config <(cat /etc/ssl/openssl.cnf <(printf '[SAN]\nsubjectAltName=DNS:{{ site_hosts | join(',DNS:') }}')) > {{ acme_tiny_data_directory }}/csrs/{{ item.key }}-{{ site_hosts_hash }}.csr"
   args:
     executable: /bin/bash
-    creates: "{{ acme_tiny_data_directory }}/csrs/{{ item.key }}.csr"
+    creates: "{{ acme_tiny_data_directory }}/csrs/{{ item.key }}-{{ site_hosts_hash }}.csr"
   when: site_uses_letsencrypt
   with_dict: "{{ wordpress_sites }}"
-  tags: [letsencrypt_keys]
 
 - name: Generate the initial certificate
   command: ./renew-certs.py
@@ -33,8 +30,7 @@
 
 - name: Disable Nginx site
   file:
-    path: "{{ nginx_path }}/sites-enabled/letsencrypt-{{ item.key }}.conf"
+    path: "{{ nginx_path }}/sites-enabled/letsencrypt-{{ item.key }}-{{ site_hosts_hash }}.conf"
     state: absent
   with_dict: "{{ wordpress_sites }}"
-  when: sites_need_confs
   notify: reload nginx

@@ -5,6 +5,7 @@ import re
 import sys
 
 from __main__ import cli
+from ansible.cli import CLI
 from ansible.compat.six import iteritems
 from ansible.errors import AnsibleError
 from ansible.parsing.dataloader import DataLoader
@@ -85,10 +86,33 @@ class CallbackModule(CallbackBase):
         except:
             return True
 
+    def vault_vars(self):
+        vault_vars = {}
+
+        if getattr(self._options, 'vault_password_file', None) is not None:
+            vault_pass = CLI.read_vault_password_file(self._options.vault_password_file, loader=self.loader)
+            self.loader.set_vault_password(vault_pass)
+        elif getattr(self._options, 'ask_vault_pass', False):
+            vault_pass = CLI.ask_vault_passwords()[0]
+            self.loader.set_vault_password(vault_pass)
+
+        for env in ['development', 'staging', 'production', 'all']:
+            vault_vars[env] = self.loader.load_from_file('group_vars/{}/vault.yml'.format(env)) if self.loader.path_exists('group_vars/{}/vault.yml'.format(env)) else {}
+
+            if vault_vars[env] is None:
+                vault_vars[env] = {}
+
+            for key in vault_vars[env].keys():
+                vault_vars[env][key] = self.raw_triage(key, vault_vars[env][key], ['(.)*'])
+
+        return vault_vars
+
     def v2_playbook_on_play_start(self, play):
         for host in play.get_variable_manager()._inventory.list_hosts(play.hosts[0]):
             hostvars = play.get_variable_manager().get_vars(loader=self.loader, play=play, host=host)
             self.raw_vars(play, host, hostvars)
+            host.vars['vault_vars'] = self.vault_vars()
+            host.vars['users_raw'] = self.raw_triage('users', hostvars['users'], ['(.)*'])
             host.vars['cli_options'] = self.cli_options()
             host.vars['cli_ask_pass'] = getattr(self._options, 'ask_pass', False)
             host.vars['cli_ask_become_pass'] = getattr(self._options, 'become_ask_pass', False)

@@ -1,0 +1,5 @@
+{% from 'render_vars.j2' import custom_vars, default_var with context -%}
+
+# Documentation: https://roots.io/trellis/docs/vault/
+{{ default_var('vault_mail_password', vault_vars[item.env], vault_passwords_length) }}
+{{ custom_vars(vault_vars[item.env].keys() | difference(vault_vars_default[item.env]), vault_vars[item.env], 0, true) -}}

@@ -1,0 +1,95 @@
+# ----------------------------
+# vault.yml variables settings
+# ----------------------------
+
+# Shell command that will be run on your local machine to create default passwords and salts/keys
+random_string_cmd: head -c 500 /dev/urandom | perl -pe 'tr/A-Za-z0-9_!@#$%^&*()[]+={}|<>?:;.`-//dc;' | fold -w 66 | head -n 1
+
+# Number of characters in passwords
+vault_passwords_length: 15
+
+# Set to `true` to recreate values for the default variables in `vault.yml` files
+vault_overwrite_default_vars: false
+
+# Set to `true` to limit `vault_wordpress_sites` to only the sites in `wordpress_sites`
+vault_remove_old_sites: false
+
+# Set to `true` to limit `vault_users` to only the users in `wordpress_sites`
+vault_remove_old_users: false
+
+
+# ----------------------------
+# vault.yml files settings
+# ----------------------------
+
+# Indicate whether vault.yml files should be `encrypted` or `decrypted`
+vault_files_state: encrypted
+
+# Mode for vault.yml files
+vault_files_mode: 0600
+
+# Set `true` to keep backups of vault.yml files in vault_backups_path
+vault_file_backups: true
+vault_backups_path: vault-backups
+
+
+# ----------------------------
+# password file settings
+# ----------------------------
+
+# Indicate whether a vault password file should be used (e.g., vs. --ask-vault-pass cli option)
+vault_password_file_enabled: true
+
+# Mode for vault password file
+vault_password_file_mode : 0600
+
+
+# ----------------------------
+# Helper vars -- probably shouldn't edit
+# ----------------------------
+
+vault_site_list: "{% if vault_wordpress_sites is not defined or vault_remove_old_sites %}{{ wordpress_sites.keys() }}{% else %}{{ wordpress_sites.keys() | union(vault_wordpress_sites.keys()) }}{% endif %}"
+vault_user_list: "{{ vault_remove_old_users | ternary(users_raw | map(attribute='name') | list, users_raw | map(attribute='name') | union(vault_vars[item.env].vault_users | default([]) | map(attribute='name'))) | list }}"
+vault_ask_pass: "{{ '--ask-vault-pass' in cli_options }}"
+vault_password_file_in_cfg: "{{ lookup('ini', 'vault_password_file section=defaults file=ansible.cfg') }}"
+vault_password_file: "{{ vault_password_file_in_cfg | ternary(vault_password_file_in_cfg, '.vault_pass') }}"
+vault_password: "{{ lookup('password', vault_password_file) }}"
+vault_password_file_cli_option: "{{ ('vault-password-file' in cli_options | default('')) | ternary(cli_options | regex_replace('^(.*)(--vault-password-file=[^ ]+)(.*)$', '\\2'), '') }}"
+vault_site_env_vars: "{{ (item.env == 'development') | ternary(['db_password'], ['db_password'] + vault_site_env_salts_keys ) }}"
+vault_site_vars: "{{ (item.env == 'development') | ternary(['admin_password', 'env'], ['env']) }}"
+
+vault_vars_default:
+  development:
+    - vault_wordpress_sites
+    - vault_mysql_root_password
+  staging:
+    - vault_wordpress_sites
+    - vault_users
+    - vault_mysql_root_password
+  production:
+    - vault_wordpress_sites
+    - vault_users
+    - vault_mysql_root_password
+  all:
+    - vault_mail_password
+
+vault_user_vars:
+  - name
+  - password
+  - salt
+
+vault_site_env_salts_keys:
+  - auth_key
+  - secure_auth_key
+  - logged_in_key
+  - nonce_key
+  - auth_salt
+  - secure_auth_salt
+  - logged_in_salt
+  - nonce_salt
+
+vault_groups:
+  - production
+  - staging
+  - development
+  - all

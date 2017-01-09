@@ -1,0 +1,8 @@
+---
+- name: "Create group_vars/{{ item.env }}/vault.yml"
+  template:
+    backup: "{{ vault_file_backups }}"
+    src: "{{ playbook_dir }}/roles/vault/templates/{{ (item.env == 'all') | ternary('all-vault.yml.j2', 'env-vault.yml.j2') }}"
+    dest: "{{ playbook_dir }}/group_vars/{{ item.env }}/vault.yml"
+    mode: "{{ vault_files_mode }}"
+  when: "{{ env is not defined or env in [item.env, 'all'] }}"

@@ -1,0 +1,31 @@
+---
+- name: Development
+  hosts: development
+  connection: local
+  vars_files:
+    - roles/vault/defaults/main.yml
+  tasks:
+    - include: roles/vault/tasks/env-vault.yml
+      with_items:
+        - { env: development }
+
+- name: Staging
+  hosts: staging
+  connection: local
+  vars_files:
+    - roles/vault/defaults/main.yml
+  tasks:
+    - include: roles/vault/tasks/env-vault.yml
+      with_items:
+        - { env: staging }
+
+- name: Production and more
+  hosts: production
+  connection: local
+  pre_tasks:
+    - include: roles/vault/tasks/env-vault.yml
+      with_items:
+        - { env: production }
+        - { env: all }
+  roles:
+    - { role: vault }

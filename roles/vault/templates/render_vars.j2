@@ -1,0 +1,20 @@
+{% macro custom_vars(keys, vars, indent_chars=0, line_break_between=false) %}
+{% for key in keys %}
+{% if line_break_between and not loop.first %}
+
+{% endif %}
+{% if (vars[key] | string).startswith(('[','{')) and not (vars[key] | string).startswith(('{{','{%','{#')) %}
+
+{{ key | indent(indent_chars, true) }}:
+{{ vars[key] | to_trellis_yaml | indent(indent_chars + 2, true) }}
+{%- else %}
+
+{{ key | indent(indent_chars, true) }}: "{{ vars[key] }}"
+{%- endif %}
+{% endfor %}
+{% endmacro %}
+
+
+{% macro default_var(key, vars, length) %}
+{{ key }}: "{{ (vault_overwrite_default_vars or vars[key] is not defined) | ternary(lookup('pipe', random_string_cmd)[:length | int], vars[key]) }}"
+{%- endmacro %}

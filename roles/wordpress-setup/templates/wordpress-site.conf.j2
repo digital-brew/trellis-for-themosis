@@ -45,7 +45,7 @@ server {
 
   {% endif -%}
   {% endblock -%}
-  
+
   {% block multisite_rewrites -%}
   {% if item.value.multisite.enabled | default(false) -%}
   # Multisite rewrites
@@ -80,7 +80,7 @@ server {
   ssl_certificate_key     {{ nginx_path }}/ssl/{{ item.value.ssl.key | basename }};
 
   {% elif item.value.ssl.provider | default('manual') == 'letsencrypt' -%}
-  ssl_certificate         {{ nginx_path }}/ssl/letsencrypt/{{ item.key }}-{{ letsencrypt_cert_ids[item.key] }}-bundled.cert;
+  ssl_certificate         {{ nginx_path }}/ssl/letsencrypt/{{ item.key }}-bundled.cert;
   ssl_certificate_key     {{ nginx_path }}/ssl/letsencrypt/{{ item.key }}.key;
 
   {% elif item.value.ssl.provider | default('manual') == 'self-signed' -%}

@@ -15,24 +15,6 @@
   with_dict: "{{ wordpress_sites }}"
   when: ssl_enabled and item.value.ssl.key is defined
 
-- name: Find Let's Encrypt bundled certs with current ID in filename
-  stat:
-    path: "{{ letsencrypt_certs_dir }}/{{ item.key }}-{{ letsencrypt_cert_ids[item.key] }}-bundled.cert"
-  with_dict: "{{ wordpress_sites }}"
-  register: bundled_certs_with_id
-  when:
-    - site_uses_letsencrypt
-    - generate_certs is not defined or not generate_certs | changed
-  tags: nginx-includes
-
-- name: Rsync Let's Encrypt bundled certs into filename without ID
-  command: rsync -ac --info=NAME {{ item.stat.path }} {{ letsencrypt_certs_dir }}/{{ item.item.key }}-bundled.cert
-  with_items: "{{ bundled_certs_with_id.results }}"
-  register: sync_bundled_cert
-  changed_when: sync_bundled_cert.stdout == item.stat.path | basename
-  when: not item | skipped and item.stat.exists
-  tags: nginx-includes
-
 - include: "{{ playbook_dir }}/roles/common/tasks/disable_challenge_sites.yml"
 
 - name: Create Nginx conf for challenges location

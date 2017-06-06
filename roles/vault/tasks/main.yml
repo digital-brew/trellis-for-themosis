@@ -14,7 +14,7 @@
       line: "{{ vault_password_file }}"
       insertbefore: BOF
     with_lines: find . .. -maxdepth 1 -type f -name .gitignore
-    when: "{{ vault_password_file_enabled | bool and not vault_ask_pass }}"
+    when: "{{ vault_password_file_enabled | bool and not vault_ask_pass and vault_password_file_gitignore }}"
 
   - name: Set file mode for {{ vault_password_file }}
     file:
@@ -51,6 +51,7 @@
       line: "{{ vault_backups_path }}"
       insertbefore: BOF
     with_lines: find . .. -maxdepth 1 -type f -name .gitignore
+    when: vault_backups_path_gitignore
 
   - name: Move vault.yml backup files to {{ vault_backups_path }}
     command: "mv {{ item }} {{ item | regex_replace('group_vars(.*)', vault_backups_path + '\\1') }}"

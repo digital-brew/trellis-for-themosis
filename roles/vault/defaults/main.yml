@@ -28,9 +28,10 @@ vault_files_state: encrypted
 # Mode for vault.yml files
 vault_files_mode: 0600
 
-# Set `true` to keep backups of vault.yml files in vault_backups_path
+# Set `true` to keep backups of vault.yml files in vault_backups_path and to add path to .gitignore
 vault_file_backups: true
 vault_backups_path: vault-backups
+vault_backups_path_gitignore: true
 
 
 # ----------------------------
@@ -42,6 +43,9 @@ vault_password_file_enabled: true
 
 # Mode for vault password file
 vault_password_file_mode : 0600
+
+# Indicate whether the vault password file should be added to .gitignore
+vault_password_file_gitignore: true
 
 
 # ----------------------------

@@ -106,7 +106,11 @@ Your old `vault.yml` files are backed up automatically. You may indicate the pat
 ```
 vault_backups_path: vault-backups   # default: vault-backups
 ```
-The backups path will be added to `.gitignore` automatically.
+
+The backups path will be added to `.gitignore` by default, unless you indicate otherwise.
+```
+vault_backups_path_gitignore: false  # default: true
+```
 
 You may disable automatic backup of `vault.yml` files.
 ```
@@ -124,7 +128,11 @@ Your vault password file will be whatever file name/path you have set in your `a
 [defaults]
 vault_password_file = .vault_pass
 ```
-The vault password file name will be added to `.gitignore` automatically.
+
+The vault password file name will be added to `.gitignore` by default, unless you indicate otherwise.
+```
+vault_password_file_gitignore: false  # default: true
+```
 
 ### Password file content
 

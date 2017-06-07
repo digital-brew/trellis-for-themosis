@@ -136,7 +136,10 @@ vault_password_file_gitignore: false  # default: true
 
 ### Password file content
 
-If the vault password file exists, its password will be used. Otherwise, the file will be created with a random password.
+If the vault password file exists, its password will be used. Otherwise, the file will be created with a random password. You may specify the length to be used when creating the password in the vault password file.
+```
+vault_password_file_length: 25  # default: 25
+```
 
 ### Password file mode
 

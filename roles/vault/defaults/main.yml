@@ -57,7 +57,8 @@ vault_user_list: "{{ vault_remove_old_users | ternary(users_raw | map(attribute=
 vault_ask_pass: "{{ '--ask-vault-pass' in cli_options }}"
 vault_password_file_in_cfg: "{{ lookup('ini', 'vault_password_file section=defaults file=ansible.cfg') }}"
 vault_password_file: "{{ vault_password_file_in_cfg | ternary(vault_password_file_in_cfg, '.vault_pass') }}"
-vault_password_value: "{{ lookup('password', vault_password_file) }}"
+vault_password_file_length: 25
+vault_password_value: "{{ lookup('password', vault_password_file + ' length=' + vault_password_file_length | string) }}"
 vault_password_file_cli_option: "{{ ('vault-password-file' in cli_options | default('')) | ternary(cli_options | regex_replace('^(.*)(--vault-password-file=[^ ]+)(.*)$', '\\2'), '') }}"
 vault_site_env_vars: "{{ (vault_env == 'development') | ternary(['db_password'], ['db_password'] + vault_site_env_salts_keys ) }}"
 vault_site_vars: "{{ (vault_env == 'development') | ternary(['admin_password', 'env'], ['env']) }}"

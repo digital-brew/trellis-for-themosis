@@ -1,29 +1,10 @@
 ---
-- include: general-setup.yml
+- name: General vault setup
+  include: setup-general.yml
   static: no
   when: vault_env is not defined
 
-- name: Ensure {{ vault_backups_path }}/{{ vault_env | default('all') }} is present
-  file:
-    path: "{{ vault_backups_path }}/{{ vault_env | default('all') }}"
-    state: directory
-  when: vault_file_backups
-
-- name: Create group_vars/{{ vault_env is defined | ternary('<env>', 'all') }}/vault.yml file
-  template:
-    backup: "{{ vault_file_backups }}"
-    src: "{{ vault_env is defined | ternary('env-vault.yml.j2', 'all-vault.yml.j2') }}"
-    dest: group_vars/{{ vault_env | default('all') }}/vault.yml
-    mode: "{{ vault_files_mode }}"
-  notify: Move vault.yml backup to backups directory
-
-- name: Encrypt vault.yml file
-  command: ansible-vault encrypt {{ item }} {{ vault_password_file_cli_option }}
-  with_lines: 'grep --files-without-match "^\$ANSIBLE_VAULT;" group_vars/{{ vault_env | default("all") }}/vault.yml ||:'
-  when: vault_files_state == 'encrypted'
-
-- name: Set mode on vault.yml file
-  file:
-    path: group_vars/{{ vault_env | default('all') }}/vault.yml
-    mode: "{{ vault_files_mode }}"
-  when: vault_files_state == 'encrypted'
+- name: Vault setup per environment
+  include: setup-per-env.yml
+  static: no
+  when: vault_env is defined

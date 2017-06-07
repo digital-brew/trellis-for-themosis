@@ -1,25 +1,18 @@
 ---
-- name: Create vault hosts
-  hosts: localhost
-  connection: local
-  gather_facts: false
-  tasks:
-    - name: Create vault hosts
-      add_host:
-        name: "{{ item }}"
-        groups: "{{ item }},vault_hosts"
-        vault_env: "{{ item }}"
-      with_items: "{{ env is defined | ternary([env], envs) | intersect(groups.keys()) }}"
-      changed_when: false
-      vars:
-        envs: ['production','staging','development']
-
-- name: General vault setup and create group_vars/all/vault.yml
+- name: General vault setup
   hosts: localhost
   connection: local
   gather_facts: false
   roles:
     - { role: vault }
+  post_tasks:
+    - name: Create dynamic vault hosts by environment
+      add_host:
+        name: "{{ item }}"
+        groups: "{{ item }},vault_hosts"
+        vault_env: "{{ item }}"
+      with_items: "{{ env is defined | ternary([env], vault_groups) | intersect(groups.keys()) }}"
+      changed_when: false
 
 - name: Create and process group_vars/<env>/vault.yml files
   hosts: vault_hosts

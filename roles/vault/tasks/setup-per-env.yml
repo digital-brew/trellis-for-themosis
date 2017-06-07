@@ -1,0 +1,25 @@
+---
+- name: Ensure {{ vault_backups_path }}/<env> is present
+  file:
+    path: "{{ vault_backups_path }}/{{ vault_env }}"
+    state: directory
+  when: vault_file_backups
+
+- name: Create vault.yml files
+  template:
+    backup: "{{ vault_file_backups }}"
+    src: "{{ (vault_env == 'all') | ternary('all-vault.yml.j2', 'env-vault.yml.j2') }}"
+    dest: group_vars/{{ vault_env }}/vault.yml
+    mode: "{{ vault_files_mode }}"
+  notify: Move vault.yml backup to backups directory
+
+- name: Encrypt vault.yml files
+  command: ansible-vault encrypt {{ item }} {{ vault_password_file_cli_option }}
+  with_lines: 'grep --files-without-match "^\$ANSIBLE_VAULT;" group_vars/{{ vault_env }}/vault.yml ||:'
+  when: vault_files_state == 'encrypted'
+
+- name: Set mode on vault.yml files
+  file:
+    path: group_vars/{{ vault_env }}/vault.yml
+    mode: "{{ vault_files_mode }}"
+  when: vault_files_state == 'encrypted'

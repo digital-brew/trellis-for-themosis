@@ -23,3 +23,12 @@
     path: group_vars/{{ vault_env }}/vault.yml
     mode: "{{ vault_files_mode }}"
   when: vault_files_state == 'encrypted'
+
+- name: Warn about unencrypted vault.yml files
+  debug:
+    msg: |
+      WARNING: The following files are still NOT encrypted:
+        {{ unencrypted_files | indent(2) }}
+  when: unencrypted_files != '' and inventory_hostname == ansible_play_batch | first
+  vars:
+    unencrypted_files: "{{ lookup('pipe', 'grep --files-without-match \"^\\$ANSIBLE_VAULT;\" group_vars/*/vault.yml ||:') }}"

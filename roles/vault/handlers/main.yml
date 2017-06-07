@@ -1,0 +1,4 @@
+---
+- name: Move vault.yml backup to backups directory
+  command: "mv {{ item }} {{ item | regex_replace('group_vars(.*)', vault_backups_path + '\\1') }}"
+  with_lines: find group_vars/{{ vault_env | default('all') }} -type f -name vault.yml.*

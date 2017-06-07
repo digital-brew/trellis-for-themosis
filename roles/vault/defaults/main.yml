@@ -53,14 +53,14 @@ vault_password_file_gitignore: true
 # ----------------------------
 
 vault_site_list: "{% if vault_wordpress_sites is not defined or vault_remove_old_sites %}{{ wordpress_sites.keys() }}{% else %}{{ wordpress_sites.keys() | union(vault_wordpress_sites.keys()) }}{% endif %}"
-vault_user_list: "{{ vault_remove_old_users | ternary(users_raw | map(attribute='name') | list, users_raw | map(attribute='name') | union(vault_vars[item.env].vault_users | default([]) | map(attribute='name'))) | list }}"
+vault_user_list: "{{ vault_remove_old_users | ternary(users_raw | map(attribute='name') | list, users_raw | map(attribute='name') | union(vault_vars[vault_env].vault_users | default([]) | map(attribute='name'))) | list }}"
 vault_ask_pass: "{{ '--ask-vault-pass' in cli_options }}"
 vault_password_file_in_cfg: "{{ lookup('ini', 'vault_password_file section=defaults file=ansible.cfg') }}"
 vault_password_file: "{{ vault_password_file_in_cfg | ternary(vault_password_file_in_cfg, '.vault_pass') }}"
-vault_password: "{{ lookup('password', vault_password_file) }}"
+vault_password_value: "{{ lookup('password', vault_password_file) }}"
 vault_password_file_cli_option: "{{ ('vault-password-file' in cli_options | default('')) | ternary(cli_options | regex_replace('^(.*)(--vault-password-file=[^ ]+)(.*)$', '\\2'), '') }}"
-vault_site_env_vars: "{{ (item.env == 'development') | ternary(['db_password'], ['db_password'] + vault_site_env_salts_keys ) }}"
-vault_site_vars: "{{ (item.env == 'development') | ternary(['admin_password', 'env'], ['env']) }}"
+vault_site_env_vars: "{{ (vault_env == 'development') | ternary(['db_password'], ['db_password'] + vault_site_env_salts_keys ) }}"
+vault_site_vars: "{{ (vault_env == 'development') | ternary(['admin_password', 'env'], ['env']) }}"
 
 vault_vars_default:
   development:

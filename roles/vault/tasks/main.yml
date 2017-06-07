@@ -1,60 +1,28 @@
 ---
-- block:
-  - name: Add vault_password_file setting to ansible.cfg
-    ini_file:
-      dest: ansible.cfg
-      section: defaults
-      option: vault_password_file
-      value: "{{ vault_password_file }}"
-    when: "{% if vault_password_file_enabled | bool and not vault_ask_pass %}{{ vault_password is defined }}{% else %}{{ false }}{% endif %}"
+- include: general-setup.yml
+  static: no
+  when: vault_env is not defined
 
-  - name: Add {{ vault_password_file }} to .gitignore
-    lineinfile:
-      dest: "{{ item }}"
-      line: "{{ vault_password_file }}"
-      insertbefore: BOF
-    with_lines: find . .. -maxdepth 1 -type f -name .gitignore
-    when: "{{ vault_password_file_enabled | bool and not vault_ask_pass and vault_password_file_gitignore }}"
+- name: Ensure {{ vault_backups_path }}/{{ vault_env | default('all') }} is present
+  file:
+    path: "{{ vault_backups_path }}/{{ vault_env | default('all') }}"
+    state: directory
+  when: vault_file_backups
 
-  - name: Set file mode for {{ vault_password_file }}
-    file:
-      path: "{{ vault_password_file }}"
-      mode: "{{ vault_password_file_mode }}"
-    when: "{{ vault_password_file_enabled | bool and not vault_ask_pass }}"
+- name: Create group_vars/{{ vault_env is defined | ternary('<env>', 'all') }}/vault.yml file
+  template:
+    backup: "{{ vault_file_backups }}"
+    src: "{{ vault_env is defined | ternary('env-vault.yml.j2', 'all-vault.yml.j2') }}"
+    dest: group_vars/{{ vault_env | default('all') }}/vault.yml
+    mode: "{{ vault_files_mode }}"
+  notify: Move vault.yml backup to backups directory
 
-  - name: Encrypt vault.yml files
-    command: ansible-vault encrypt group_vars/{{ item }}/vault.yml {{ vault_password_file_cli_option }}
-    with_items: "{{ vault_groups | intersect(groups.keys()) }}"
-    when: "{{ env is not defined or env in [item, 'all'] }}"
-
-  - name: Set mode on vault.yml files
-    file:
-      path: group_vars/{{ item }}/vault.yml
-      mode: "{{ vault_files_mode }}"
-    with_items: "{{ vault_groups | intersect(groups.keys()) }}"
-    when: "{{ env is not defined or env in [item, 'all'] }}"
-
+- name: Encrypt vault.yml file
+  command: ansible-vault encrypt group_vars/{{ vault_env | default('all') }}/vault.yml {{ vault_password_file_cli_option }}
   when: vault_files_state == 'encrypted'
 
-- block:
-  - name: Ensure {{ vault_backups_path }} is present
-    file:
-      path: "{{ item }}"
-      state: directory
-    with_items:
-      - "{{ vault_backups_path }}"
-      - "{{ vault_groups | intersect(groups.keys()) | map('regex_replace', '(.*)', vault_backups_path + '/\\1') | list }}"
-
-  - name: Add {{ vault_backups_path }} to .gitignore
-    lineinfile:
-      dest: "{{ item }}"
-      line: "{{ vault_backups_path }}"
-      insertbefore: BOF
-    with_lines: find . .. -maxdepth 1 -type f -name .gitignore
-    when: vault_backups_path_gitignore
-
-  - name: Move vault.yml backup files to {{ vault_backups_path }}
-    command: "mv {{ item }} {{ item | regex_replace('group_vars(.*)', vault_backups_path + '\\1') }}"
-    with_lines: find group_vars -type f -name vault.yml.*
-
-  when: vault_file_backups
+- name: Set mode on vault.yml file
+  file:
+    path: group_vars/{{ vault_env | default('all') }}/vault.yml
+    mode: "{{ vault_files_mode }}"
+  when: vault_files_state == 'encrypted'

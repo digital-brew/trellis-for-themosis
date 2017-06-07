@@ -1,14 +1,14 @@
 {% from 'render_vars.j2' import custom_vars, default_var with context -%}
 
 # Documentation: https://roots.io/trellis/docs/vault/
-{{ default_var('vault_mysql_root_password', vault_vars[item.env], vault_passwords_length) }}
-{% if item.env != 'development' %}
+{{ default_var('vault_mysql_root_password', vault_vars[vault_env], vault_passwords_length) }}
+{% if vault_env != 'development' %}
 
 # Documentation: https://roots.io/trellis/docs/security/
 vault_users:
 {% for user_name in vault_user_list -%}
-{% set user = (user_name in vault_vars[item.env].vault_users | default([]) | map(attribute='name') | list) |
-    ternary(vault_vars[item.env].vault_users | default([]) | selectattr('name', 'equalto', user_name) | list | first, {}) %}
+{% set user = (user_name in vault_vars[vault_env].vault_users | default([]) | map(attribute='name') | list) |
+    ternary(vault_vars[vault_env].vault_users | default([]) | selectattr('name', 'equalto', user_name) | list | first, {}) %}
   - name: "{{ user_name }}"
     {{ default_var('password', user, vault_passwords_length) }}
     {{ default_var('salt', user, 16) }}
@@ -21,7 +21,7 @@ vault_users:
 vault_wordpress_sites:
 {% for key in vault_site_list %}
 {% if vault_wordpress_sites is defined and key in vault_wordpress_sites.keys() %}
-{% set site = vault_vars[item.env].vault_wordpress_sites[key] %}
+{% set site = vault_vars[vault_env].vault_wordpress_sites[key] %}
 {% else %}
 {% set site = {'env':{}} %}
 {% endif %}
@@ -29,12 +29,12 @@ vault_wordpress_sites:
 
 {% endif %}
   {{ key }}:
-    {% if item.env == 'development' -%}
+    {% if vault_env == 'development' -%}
     {{ default_var('admin_password', site, vault_passwords_length) }}
     {% endif -%}
     env:
       {{ default_var('db_password', site.env, vault_passwords_length) }}
-{% if item.env != 'development' %}
+{% if vault_env != 'development' %}
       # Generate your keys here: https://roots.io/salts.html
 {% for var in vault_site_env_salts_keys %}
 {% if not loop.first %}
@@ -47,4 +47,4 @@ vault_wordpress_sites:
     {{- custom_vars(site.keys() | difference(vault_site_vars), site, 4) -}}
 {% endfor %}
 
-{{ custom_vars(vault_vars[item.env].keys() | difference(vault_vars_default[item.env]), vault_vars[item.env], 0, true) -}}
+{{ custom_vars(vault_vars[vault_env].keys() | difference(vault_vars_default[vault_env]), vault_vars[vault_env], 0, true) -}}

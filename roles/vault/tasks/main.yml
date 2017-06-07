@@ -18,7 +18,8 @@
   notify: Move vault.yml backup to backups directory
 
 - name: Encrypt vault.yml file
-  command: ansible-vault encrypt group_vars/{{ vault_env | default('all') }}/vault.yml {{ vault_password_file_cli_option }}
+  command: ansible-vault encrypt {{ item }} {{ vault_password_file_cli_option }}
+  with_lines: 'grep --files-without-match "^\$ANSIBLE_VAULT;" group_vars/{{ vault_env | default("all") }}/vault.yml ||:'
   when: vault_files_state == 'encrypted'
 
 - name: Set mode on vault.yml file

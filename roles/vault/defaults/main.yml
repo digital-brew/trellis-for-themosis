@@ -17,6 +17,9 @@ vault_remove_old_sites: false
 # Set to `true` to limit `vault_users` to only the users in `wordpress_sites`
 vault_remove_old_users: false
 
+# Override creating `admin_password` only in the `development` environment
+vault_generate_admin_passwords: false
+
 
 # ----------------------------
 # vault.yml files settings
@@ -61,7 +64,7 @@ vault_password_file_length: 25
 vault_password_value: "{{ lookup('password', vault_password_file + ' length=' + vault_password_file_length | string) }}"
 vault_password_file_cli_option: "{{ ('vault-password-file' in cli_options | default('')) | ternary(cli_options | regex_replace('^(.*)(--vault-password-file=[^ ]+)(.*)$', '\\2'), '') }}"
 vault_site_env_vars: "{{ (vault_env == 'development') | ternary(['db_password'], ['db_password'] + vault_site_env_salts_keys ) }}"
-vault_site_vars: "{{ (vault_env == 'development') | ternary(['admin_password', 'env'], ['env']) }}"
+vault_site_vars: "{{ (vault_env == 'development' or vault_generate_admin_passwords) | ternary(['admin_password', 'env'], ['env']) }}"
 
 vault_vars_default:
   development:

@@ -29,7 +29,7 @@ vault_wordpress_sites:
 
 {% endif %}
   {{ key }}:
-    {% if vault_env == 'development' -%}
+    {% if vault_env == 'development' or vault_generate_admin_passwords -%}
     {{ default_var('admin_password', site, vault_passwords_length) }}
     {% endif -%}
     env:

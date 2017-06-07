@@ -74,6 +74,13 @@ You may purge `vault_users` of users that are no longer in `users`.
 vault_remove_old_users: true   # default: false
 ```
 
+### WP admin_user passwords
+
+The `admin_password` variable for the WP `admin_user` will be generated for the development environment by default. You may set this `admin_password` to be generated in the staging and production environments as well.
+```
+vault_generate_admin_passwords: true   # default: false
+```
+
 ### Raw values
 
 If you wrap a `vault.yml` variable value in `{% raw %}`, you will notice that this playbook strips off the `{% raw %}`. Instead of using `{% raw %}` to prevent a variable value from being templated, just add the variable to the `raw_vars` list in `group_vars/all/main.yml`. Then the variable's value will be wrapped in `{% raw %}` automatically behind the scenes.

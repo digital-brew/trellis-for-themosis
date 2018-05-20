@@ -24,7 +24,7 @@
 - name: Validate wordpress_sites
   fail:
     msg: "{{ lookup('template', 'wordpress_sites.j2') }}"
-  when: wordpress_sites.keys() | difference(vault_wordpress_sites.keys()) | count
+  when: wordpress_sites.keys() | list | difference(vault_wordpress_sites.keys() | list) | count
   tags: [wordpress]
 
 - name: Validate format of site_hosts
@@ -48,7 +48,7 @@
       php_extensions_custom: "{{ php_extensions_custom }}"
       sshd_packages_default: "{{ sshd_packages_default }}"
       sshd_packages_custom: "{{ sshd_packages_custom }}"
-    package_vars_wrong_format: "[{% for k,v in package_vars.iteritems() if v | type_debug != 'dict' %}'{{ k }}',{% endfor %}]"
+    package_vars_wrong_format: "[{% for k,v in package_vars.items() if v | type_debug != 'dict' %}'{{ k }}',{% endfor %}]"
   tags: [sshd, memcached, php]
 
 - name: Verify dict format for apt package combined variables
@@ -61,7 +61,7 @@
       memcached_packages: "{{ memcached_packages }}"
       php_extensions: "{{ php_extensions }}"
       sshd_packages: "{{ sshd_packages }}"
-    package_vars_wrong_format: "[{% for k,v in package_vars.iteritems() if v | type_debug != 'dict' %}'{{ k }}',{% endfor %}]"
+    package_vars_wrong_format: "[{% for k,v in package_vars.items() if v | type_debug != 'dict' %}'{{ k }}',{% endfor %}]"
   tags: [sshd, memcached, php]
 
 - name: Validate Ubuntu version
@@ -78,7 +78,8 @@
       Development via Vagrant: `vagrant destroy && vagrant up`
 
       Staging/Production: Create a new server with Ubuntu 16.04 and provision
-  when: ansible_distribution_release != 'xenial'
+  # when: ansible_distribution_release != 'xenial'
+  when: false
 
 - name: Check whether passlib is needed
   fail:
@@ -145,7 +146,8 @@
 
 - name: Retrieve SSH client IP
   ipify_facts:
-  connection: local
+  delegate_to: localhost
+  run_once: true
   become: no
   when: env != 'development' and ssh_client_ip_lookup | default(true)
   tags: [fail2ban, ferm]

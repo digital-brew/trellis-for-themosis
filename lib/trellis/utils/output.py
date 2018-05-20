@@ -89,7 +89,7 @@ def display(obj, result):
     # Must pass unicode strings to Display.display() to prevent UnicodeError tracebacks
     if isinstance(msg, list):
         msg = '\n'.join([to_text(x) for x in msg])
-    elif not isinstance(msg, unicode):
+    else:
         msg = to_text(msg)
 
     # Wrap text

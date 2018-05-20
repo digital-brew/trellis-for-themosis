@@ -1,7 +1,7 @@
 Invalid WordPress sites configuration: site names in `wordpress_sites` must have matching entry in `vault_wordpress_sites`.
 
 Sites without a matching vault entry:
-{% for name in wordpress_sites.keys() | difference(vault_wordpress_sites.keys()) %}
+{% for name in wordpress_sites.keys() | list | difference(vault_wordpress_sites.keys() | list) %}
 * `{{ name }}`
 {% endfor %}
 

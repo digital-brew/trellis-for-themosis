@@ -15,7 +15,7 @@ server {
   {% endblock %}
 
   {% block server_basic -%}
-  root  {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}/web;
+  root  {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}/htdocs;
   index index.php index.htm index.html;
   add_header Fastcgi-Cache $upstream_cache_status;
 
@@ -25,7 +25,7 @@ server {
   # Set the max body size equal to PHP's max POST size.
   client_max_body_size {{ php_post_max_size | default('25m') | lower }};
 
-  {% if env == 'development' -%}
+  {% if env == 'local' -%}
   # https://www.nginx.com/resources/wiki/start/topics/tutorials/config_pitfalls/#virtualbox
   sendfile off;
 
@@ -53,14 +53,14 @@ server {
   {% if item.value.multisite.enabled | default(false) -%}
   # Multisite rewrites
   {% if item.value.multisite.subdomains | default(false) -%}
-  rewrite ^/(wp-.*.php)$ /wp/$1 last;
-  rewrite ^/(wp-(content|admin|includes).*) /wp/$1 last;
+  rewrite ^/(wp-.*.php)$ /cms/$1 last;
+  rewrite ^/(wp-(content|admin|includes).*) /cms/$1 last;
 
   {% else -%}
   if (!-e $request_filename) {
     rewrite /wp-admin$ $scheme://$host$uri/ permanent;
-    rewrite ^(/[^/]+)?(/wp-.*) /wp$2 last;
-    rewrite ^(/[^/]+)?(/.*\.php) /wp$2 last;
+    rewrite ^(/[^/]+)?(/wp-.*) /cms$2 last;
+    rewrite ^(/[^/]+)?(/.*\.php) /cms$2 last;
   }
 
   {% endif -%}
@@ -117,7 +117,7 @@ server {
 
   {% block location_uploads_php -%}
   # Prevent PHP scripts from being executed inside the uploads folder.
-  location ~* /app/uploads/.*\.php$ {
+  location ~* /content/uploads/.*\.php$ {
     deny all;
   }
   {% endblock %}

@@ -21,17 +21,18 @@ Trellis will configure a server with the following and more:
 * HTTP/2 support (requires SSL)
 * Composer
 * WP-CLI
-* sSMTP (mail delivery)
+* SMTP (mail delivery)
 * MailHog
 * Memcached
 * Fail2ban and ferm
 
 ## What's different
 * It's prepared to work with Themosis Framework, NOT Bedrock
-* Modified version of trellis-cli inside
 * Option to manage database and uploads migration (based on [this package](https://github.com/valentinocossar/trellis-database-uploads-migration))
 * Option to manage plugins folder migration
 * Option to manage private composer packages migration
+* Package [vagrant-trellis-cert](https://github.com/TypistTech/vagrant-trellis-cert) installed as default
+* You need to set vagrant machine name in vagrant_default.yml
 
 
 ## Documentation

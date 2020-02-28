@@ -62,7 +62,7 @@ module Trellis
     end
 
     def path
-      File.join(@root_path, 'group_vars', 'development', 'wordpress_sites.yml')
+      File.join(@root_path, 'group_vars', 'local', 'wordpress_sites.yml')
     end
 
     def template_content

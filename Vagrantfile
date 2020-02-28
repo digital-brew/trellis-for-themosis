@@ -145,7 +145,7 @@ Vagrant.configure('2') do |config|
 
     ansible.groups = {
       'web' => ['default'],
-      'development' => ['default']
+      'local' => ['default']
     }
 
     ansible.tags = ENV['ANSIBLE_TAGS']
@@ -169,7 +169,7 @@ Vagrant.configure('2') do |config|
 
   # VirtualBox settings
   config.vm.provider 'virtualbox' do |vb|
-    vb.name = config.vm.hostname
+    vb.name = vconfig.fetch('vagrant_box_name')
     vb.customize ['modifyvm', :id, '--cpus', vconfig.fetch('vagrant_cpus')]
     vb.customize ['modifyvm', :id, '--memory', vconfig.fetch('vagrant_memory')]
     vb.customize ['modifyvm', :id, '--ioapic', vconfig.fetch('vagrant_ioapic', 'on')]

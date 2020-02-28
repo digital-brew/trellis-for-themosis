@@ -1,5 +1,6 @@
 ---
-vagrant_ip: '192.168.50.5'
+vagrant_box_name: 'your_vagrant_name'
+vagrant_ip: '192.168.80.10'
 vagrant_cpus: 1
 vagrant_memory: 1024 # in MB
 vagrant_box: 'bento/ubuntu-18.04'
@@ -12,7 +13,7 @@ vagrant_install_plugins: true
 vagrant_plugins:
   - name: vagrant-bindfs
   - name: vagrant-hostmanager
-
+  - name: vagrant-trellis-cert
 # Array of synced folders:
 # - local_path: .
 #   destination: /path/on/vm

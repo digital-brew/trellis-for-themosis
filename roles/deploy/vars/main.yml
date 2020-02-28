@@ -1,11 +1,11 @@
 wordpress_env_defaults:
-  db_host: localhost
-  db_name: "{{ site | underscore }}_{{ env }}"
-  db_user: "{{ site | underscore }}"
+  database_host: localhost
+  database_name: "{{ site | underscore }}_{{ env }}"
+  database_user: "{{ site | underscore }}"
   disable_wp_cron: true
-  wp_env: "{{ env }}"
-  wp_home: "{{ project.ssl.enabled | default(false) | ternary('https', 'http') }}://{{ project.site_hosts | map(attribute='canonical') | first }}"
-  wp_siteurl: "{{ project.ssl.enabled | default(false) | ternary('https', 'http') }}://{{ project.site_hosts | map(attribute='canonical') | first }}/wp"
+  app_env: "{{ env }}"
+  app_url: "{{ project.ssl.enabled | default(false) | ternary('https', 'http') }}://{{ project.site_hosts | map(attribute='canonical') | first }}"
+  wp_url: "{{ project.ssl.enabled | default(false) | ternary('https', 'http') }}://{{ project.site_hosts | map(attribute='canonical') | first }}/cms"
   domain_current_site: "{{ project.site_hosts | map(attribute='canonical') | first }}"
   git_sha: "{{ git_clone.after }}"
   release_version: "{{ deploy_helper.new_release }}"

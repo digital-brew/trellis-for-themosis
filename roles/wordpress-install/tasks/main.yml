@@ -45,7 +45,7 @@
 - name: Install WP
   command: wp core {{ item.value.multisite.enabled | default(false) | ternary('multisite-install', 'install') }}
            --allow-root
-           --url="{{ site_env.wp_home }}"
+           --url="{{ site_env.app_url }}"
            {% if item.value.multisite.enabled | default(false) %}
            --base="{{ item.value.multisite.base_path | default('/') }}"
            {% if item.value.multisite.subdomains | default('false') %}
@@ -71,7 +71,7 @@
   when: item is changed
 
 - name: Update WP Multisite Home URL
-  command: wp option update home {{ site_env.wp_home }} --allow-root
+  command: wp option update home {{ site_env.app_url }} --allow-root
   args:
     chdir: "{{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}/"
   with_dict: "{{ wordpress_sites }}"

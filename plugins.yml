@@ -1,0 +1,61 @@
+---
+- name: Sync plugins between environments
+  hosts: web:&{{ env }}
+  remote_user: "{{ web_user }}"
+
+  vars:
+    project: "{{ wordpress_sites[site] }}"
+    project_root: "{{ www_root }}/{{ site }}"
+
+  tasks:
+    - name: Abort if environment variable is equal to local
+      fail:
+        msg: "ERROR: local is not a valid environment for this mode (you can't push/pull from local to local)."
+      when: env == "local"
+
+    - name: Check if {{ site }} folder exists
+      delegate_to: local_host
+      stat:
+        path: "{{ project_root }}"
+      register: result
+
+    - name: Abort if {{ site }} folder doesn't exist
+      fail:
+        msg: "ERROR: {{ site }} is not a valid site name ({{ site }} folder does not exist)."
+      when: result.stat.exists is defined and result.stat.exists == false or result.stat.isdir is defined and result.stat.isdir == false
+
+    - block:
+        - name: Push plugins
+          synchronize:
+            src: "{{ project.local_path }}/htdocs/content/plugins/"
+            dest: "{{ project_root }}/current/htdocs/content/plugins/"
+            mode: push
+            delete: yes
+            recursive: yes
+            rsync_opts:
+              - "--exclude=your_plugin/node_modules"
+              - "--exclude=your_plugin/.git"
+          when: mode is defined and mode == "push"
+          register: output_push
+
+        - name: Push plugins output
+          debug:
+            var: output_push.stdout_lines
+          when: output_push.skipped is not defined
+
+        - name: Pull plugins
+          synchronize:
+            src: "{{ project_root }}/current/htdocs/content/plugins/"
+            dest: "{{ project.local_path }}/htdocs/content/plugins/"
+            mode: pull
+            delete: yes
+            recursive: yes
+            rsync_opts: --exclude=.DS_Store --stats
+          when: mode is defined and mode == "pull"
+          register: output_pull
+
+        - name: Pull plugins output
+          debug:
+            var: output_pull.stdout_lines
+          when: output_pull.skipped is not defined
+      when: result.stat.exists is defined and result.stat.exists and result.stat.isdir is defined and result.stat.isdir

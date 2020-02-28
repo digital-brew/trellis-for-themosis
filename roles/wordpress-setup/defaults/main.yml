@@ -1,4 +1,4 @@
-site_uses_local_db: "{{ site_env.db_host == 'localhost' }}"
+site_uses_local_db: "{{ site_env.database_host == 'localhost' }}"
 nginx_wordpress_site_conf: wordpress-site.conf.j2
 nginx_ssl_path: "{{ nginx_path }}/ssl"
 
@@ -39,7 +39,7 @@ nginx_includes_pattern: "^({{ nginx_includes_templates_path | regex_escape }}|{{
 nginx_includes_d_cleanup: true
 
 # h5bp helpers
-not_dev: "{{ env != 'development' }}"
+not_dev: "{{ env != 'local' }}"
 h5bp: "{{ item.value.h5bp | default({}) }}"
 h5bp_cache_file_descriptors_enabled: "{{ h5bp.cache_file_descriptors | default(not_dev) }}"
 h5bp_extra_security_enabled: "{{ h5bp.extra_security | default(true) }}"

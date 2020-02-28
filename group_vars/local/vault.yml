@@ -7,4 +7,8 @@ vault_wordpress_sites:
   example.com:
     admin_password: admin
     env:
+      app_debug: true
+      app_key: your_app_key_copied_from_site_env_file
+
       db_password: example_dbpassword
+

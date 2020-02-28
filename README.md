@@ -30,12 +30,15 @@ Trellis will configure a server with the following and more:
 * It's prepared to work with Themosis Framework, NOT Bedrock
 * Option to manage database and uploads migration (based on [this package](https://github.com/valentinocossar/trellis-database-uploads-migration))
 * Option to manage plugins folder migration
+* Option to manage mu-plugins folder migration
+
 * Option to manage private composer packages migration
 * Package [vagrant-trellis-cert](https://github.com/TypistTech/vagrant-trellis-cert) installed as default
 * You need to set vagrant machine name in vagrant_default.yml
 
 ## To-Do List
 * Incorporate creating of SSL cert into main playbook
+* Generating APP_KEY variable during installation
 
 
 ## Documentation
@@ -76,16 +79,33 @@ $ git clone --depth=1 git@github.com:rafflex/trellis-for-themosis.git trellis &&
 ```
 Install Themosis into the `site` directory:
 ```shell
-$ composer create-project themosis/themosis my-project-name
+$ composer create-project themosis/themosis site
 ```
 
 [Read the Themosis Framework installation docs](https://framework.themosis.com/docs/2.0/installation) for more information.
 
 ## Local development setup
 
-1. Configure your WordPress sites in `group_vars/local/wordpress_sites.yml` and in `group_vars/local/vault.yml`
-2. Ensure you're in the trellis directory: `cd trellis`
-3. Run `vagrant up`
+Configure your WordPress sites in
+- `group_vars/local/wordpress_sites.yml`
+- `group_vars/local/vault.yml`
+- `group_vars/all/vault.yml`
+
+Ensure you're in the trellis directory: `cd trellis`
+
+Spin up machine
+```shell
+vagrant up
+```
+
+When it's done run
+```shell
+./bin/post-install-1.sh
+```
+and after that
+```shell
+./bin/post-install-2.sh
+```
 
 [Read the local development docs](https://roots.io/trellis/docs/local-development-setup/) for more information.
 
@@ -93,28 +113,13 @@ $ composer create-project themosis/themosis my-project-name
 
 A base Ubuntu 18.04 (Bionic) server is required for setting up remote servers.
 
-1. Configure your WordPress sites in `group_vars/<environment>/wordpress_sites.yml` and in `group_vars/<environment>/vault.yml` (see the [Vault docs](https://roots.io/trellis/docs/vault/) for how to encrypt files containing passwords)
-2. Add your server IP/hostnames to `hosts/<environment>`
-3. Specify public SSH keys for `users` in `group_vars/all/users.yml` (see the [SSH Keys docs](https://roots.io/trellis/docs/ssh-keys/))
+Configure your WordPress sites in
+- `group_vars/<environment>/wordpress_sites.yml`
+- `group_vars/<environment>/vault.yml` (see the [Vault docs](https://roots.io/trellis/docs/vault/) for how to encrypt files containing passwords)
 
-### Using trellis-cli
+Add your server IP/hostnames to `hosts/<environment>`
 
-Initialize Trellis (Virtualenv) environment:
-```bash
-$ trellis init
-```
-
-Provision the server:
-```bash
-$ trellis provision production
-```
-
-Or take advantage of its [Digital Ocean](https://roots.io/r/digitalocean) support to create a Droplet *and* provision it in a single command:
-```bash
-$ trellis droplet create production
-```
-
-### Manual
+Specify public SSH keys for `users` in `group_vars/all/users.yml` (see the [SSH Keys docs](https://roots.io/trellis/docs/ssh-keys/))
 
 For remote servers, installing Ansible locally is an additional requirement. See the [docs](https://roots.io/trellis/docs/remote-server-setup/#requirements) for more information.
 
@@ -130,20 +135,6 @@ $ ansible-playbook server.yml -e env=<environment>
 1. Add the `repo` (Git URL) of your Bedrock WordPress project in the corresponding `group_vars/<environment>/wordpress_sites.yml` file
 2. Set the `branch` you want to deploy (defaults to `master`)
 
-### Using trellis-cli
-
-Deploy a site:
-```bash
-$ trellis deploy <environment> <site>
-```
-
-Rollback a deploy:
-```bash
-$ trellis rollback <environment> <site>
-```
-
-### Manual
-
 Deploy a site:
 ```bash
 $ ./bin/deploy.sh <environment> <site>
@@ -155,3 +146,45 @@ $ ansible-playbook rollback.yml -e "site=<site> env=<environment>"
 ```
 
 [Read the deploys docs](https://roots.io/trellis/docs/deploys/) for more information.
+
+## Manging Database
+
+Push database to remote server:
+```bash
+$ ./bin/database.sh <environment> <site> <mode>
+```
+Available modes: `push`, `pull`, `backup`
+
+## Manging Uploads folder
+
+Push uploads to remote server:
+```bash
+$ ./bin/uploads.sh <environment> <site> <mode>
+```
+Available modes: `push`, `pull`
+
+## Manging Plugins folder
+
+Push plugins to remote server:
+```bash
+$ ./bin/plugins.sh <environment> <site> <mode>
+```
+Available modes: `push`, `pull`
+
+## Manging MU-Plugins folder
+
+Push mu-plugins to remote server:
+```bash
+$ ./bin/mu-plugins.sh <environment> <site> <mode>
+```
+Available modes: `push`, `pull`
+
+## Manging private composer packages folder
+
+Update lines 30, 31, 46, 47 in`private-composer.yml` file.
+
+Push mu-plugins to remote server:
+```bash
+$ ./bin/private-composer.sh <environment> <site> <mode>
+```
+Available modes: `push`, `pull`

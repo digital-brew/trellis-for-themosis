@@ -13,7 +13,6 @@ vault_wordpress_sites:
   example.com:
     env:
       app_debug: false
-      app_key: your_app_key_copied_from_site_env_file
 
       database_password: example_dbpassword
       # Generate your keys here: https://roots.io/salts.html

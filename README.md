@@ -37,7 +37,7 @@ Trellis will configure a server with the following and more:
 * You need to set vagrant machine name in vagrant_default.yml
 
 ## To-Do List
-* Incorporate creating of SSL cert into main playbook
+* Incorporate creating of ssl cert into main playbook
 * Generating APP_KEY variable during installation
 
 
@@ -90,6 +90,8 @@ Configure your WordPress sites in
 - `group_vars/local/wordpress_sites.yml`
 - `group_vars/local/vault.yml`
 - `group_vars/all/vault.yml`
+
+Copy APP_KEY from `site/.env` file to `group_vars/all/vault.yml`
 
 Ensure you're in the trellis directory: `cd trellis`
 

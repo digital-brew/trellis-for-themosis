@@ -6,3 +6,4 @@ vault_mail_password: smtp_password
 #
  vault_wordpress_env_defaults:
    app_td: your_text_domain
+   app_key: your_app_key_copied_from_site_env_file

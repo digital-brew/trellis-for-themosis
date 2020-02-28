@@ -1,13 +1,11 @@
-# Trellis
-[![Release](https://img.shields.io/github/release/roots/trellis.svg?style=flat-square)](https://github.com/roots/trellis/releases)
-[![Build Status](https://img.shields.io/circleci/build/gh/roots/trellis?style=flat-square)](https://circleci.com/gh/roots/trellis)
-[![Follow Roots](https://img.shields.io/twitter/follow/rootswp.svg?style=flat-square&color=1da1f2)](https://twitter.com/rootswp)
+# Trellis for Themosis [WORK IN PROGRESS]
+
 
 Ansible playbooks for setting up a LEMP stack for WordPress.
 
 - Local development environment with Vagrant
 - High-performance production servers
-- Zero-downtime deploys for your [Bedrock](https://roots.io/bedrock/)-based WordPress sites
+- Zero-downtime deploys for your [Themosis](https://framework.themosis.com/)-based WordPress sites
 - [trellis-cli](https://github.com/roots/trellis-cli) for easier management
 
 ## What's included
@@ -27,6 +25,14 @@ Trellis will configure a server with the following and more:
 * MailHog
 * Memcached
 * Fail2ban and ferm
+
+## What's different
+* It's prepared to work with Themosis Framework, NOT Bedrock
+* Modified version of trellis-cli inside
+* Option to manage database and uploads migration (based on [this package](https://github.com/valentinocossar/trellis-database-uploads-migration))
+* Option to manage plugins folder migration
+* Option to manage private composer packages migration
+
 
 ## Documentation
 
@@ -167,23 +173,3 @@ $ ansible-playbook rollback.yml -e "site=<site> env=<environment>"
 ```
 
 [Read the deploys docs](https://roots.io/trellis/docs/deploys/) for more information.
-
-## Contributing
-
-Contributions are welcome from everyone. We have [contributing guidelines](https://github.com/roots/guidelines/blob/master/CONTRIBUTING.md) to help you get started.
-
-## Trellis sponsors
-
-Help support our open-source development efforts by [becoming a patron](https://www.patreon.com/rootsdev).
-
-<a href="https://kinsta.com/?kaid=OFDHAJIXUDIV"><img src="https://cdn.roots.io/app/uploads/kinsta.svg" alt="Kinsta" width="200" height="150"></a> <a href="https://k-m.com/"><img src="https://cdn.roots.io/app/uploads/km-digital.svg" alt="KM Digital" width="200" height="150"></a> <a href="https://nestify.io/?utm_source=roots&utm_medium=banner&utm_campaign=footer"><img src="https://cdn.roots.io/app/uploads/nestify.svg" alt="Nestify" width="200" height="150"></a>
-
-## Community
-
-Keep track of development and community news.
-
-* Participate on the [Roots Discourse](https://discourse.roots.io/)
-* Follow [@rootswp on Twitter](https://twitter.com/rootswp)
-* Read and subscribe to the [Roots Blog](https://roots.io/blog/)
-* Subscribe to the [Roots Newsletter](https://roots.io/subscribe/)
-* Listen to the [Roots Radio podcast](https://roots.io/podcast/)

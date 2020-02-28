@@ -34,6 +34,9 @@ Trellis will configure a server with the following and more:
 * Package [vagrant-trellis-cert](https://github.com/TypistTech/vagrant-trellis-cert) installed as default
 * You need to set vagrant machine name in vagrant_default.yml
 
+## To-Do List
+* Incorporate creating of SSL cert into main playbook
+
 
 ## Documentation
 
@@ -51,58 +54,36 @@ Make sure all dependencies have been installed before moving on:
 
 ## Installation
 
-### Using trellis-cli
-
-Create a new project:
-```bash
-$ trellis new example.com
-```
-
-### Manual
-
 The recommended directory structure for a Trellis project looks like:
 
 ```shell
 example.com/      # → Root folder for the project
 ├── trellis/      # → Your clone of this repository
 └── site/         # → A Bedrock-based WordPress site
-    └── web/
-        ├── app/  # → WordPress content directory (themes, plugins, etc.)
-        └── wp/   # → WordPress core (don't touch!)
+    └── htdocs/
+        ├── content/  # → WordPress content directory (themes, plugins, etc.)
+        └── cms/   # → WordPress core (don't touch!)
 ```
+<br>
 
-See a complete working example in the [roots-example-project.com repo](https://github.com/roots/roots-example-project.com).
-
-
-
-1. Create a new project directory:
-```plain
+Create a new project directory:
+```shell
 $ mkdir example.com && cd example.com
 ```
-2. Install Trellis:
-```plain
-$ git clone --depth=1 git@github.com:roots/trellis.git && rm -rf trellis/.git
+Install Trellis:
+```shell
+$ git clone --depth=1 git@github.com:rafflex/trellis-for-themosis.git trellis && rm -rf trellis/.git
 ```
-3. Install Bedrock into the `site` directory:
-```plain
-$ composer create-project roots/bedrock site
+Install Themosis into the `site` directory:
+```shell
+$ composer create-project themosis/themosis my-project-name
 ```
+
+[Read the Themosis Framework installation docs](https://framework.themosis.com/docs/2.0/installation) for more information.
 
 ## Local development setup
 
-### Using trellis-cli
-
-1. Review the automatically created site in `group_vars/development/wordpress_sites.yml`
-2. Customize settings if necessary
-
-Start the Vagrant virtual machine:
-```bash
-$ trellis up
-```
-
-### Manual
-
-1. Configure your WordPress sites in `group_vars/development/wordpress_sites.yml` and in `group_vars/development/vault.yml`
+1. Configure your WordPress sites in `group_vars/local/wordpress_sites.yml` and in `group_vars/local/vault.yml`
 2. Ensure you're in the trellis directory: `cd trellis`
 3. Run `vagrant up`
 

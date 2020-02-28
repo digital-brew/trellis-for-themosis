@@ -2,7 +2,8 @@
 # List each machine only once per [group], even if it will host multiple sites.
 
 [production]
-your_server_hostname
+production_host ansible_host=your_server_hostname
 
 [web]
-your_server_hostname
+production_host ansible_host=your_server_hostname
+

@@ -34,8 +34,8 @@
 # `dev.yml` playbook with such options if you were edit the options
 # into the Vagrantfile's `config.vm.provision` section.
 
-[development]
-192.168.50.5 ansible_connection=local
+[local]
+local_host ansible_host=192.168.80.10 ansible_connection=ssh ansible_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/default/virtualbox/private_key ansible_ssh_extra_args="-o StrictHostKeyChecking=no -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null -o IdentitiesOnly=yes -o ForwardAgent=yes"
 
 [web]
-192.168.50.5 ansible_connection=local
+local_host ansible_host=192.168.80.10 ansible_connection=ssh ansible_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/default/virtualbox/private_key ansible_ssh_extra_args="-o StrictHostKeyChecking=no -o GlobalKnownHostsFile=/dev/null -o UserKnownHostsFile=/dev/null -o IdentitiesOnly=yes -o ForwardAgent=yes"
